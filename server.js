@@ -55,6 +55,16 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ── Hata yakalayıcı: iç hata detayını JSON olarak dön ──────────────
+// (Vercel 500 sayfası yerine gerçek sebebi görürüz)
+app.use((err, req, res, next) => {
+  console.error('[hata]', err);
+  return res.status(500).json({
+    ok: false,
+    error: err && err.message ? err.message : 'Bilinmeyen sunucu hatası',
+  });
+});
+
 // Vercel için express app'i export et
 module.exports = app;
 
