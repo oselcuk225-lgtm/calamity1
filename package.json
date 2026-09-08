@@ -1,0 +1,20 @@
+{
+  "name": "calamity-license-server",
+  "version": "2.0.0",
+  "description": "Calamity Loader — lisans (key) sunucusu: site + API + Neon Postgres (Vercel)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

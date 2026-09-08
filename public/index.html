@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CALAMITY</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d0e13;color:#e9ebf5;min-height:100vh}
+a{text-decoration:none}
+
+/* Nav */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#131520;border-bottom:1px solid #23263a}
+.logo{font-size:22px;font-weight:800;letter-spacing:1px}
+.logo b{color:#ff2e45}
+.nav-actions{display:flex;gap:8px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 18px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.btn-red{background:#ff2e45;color:#fff}.btn-red:hover{background:#ff5566}
+.btn-green{background:#1fc05c;color:#0d0e13}.btn-green:hover{background:#35d671}
+.btn-gray{background:#23263a;color:#9aa1bd}.btn-gray:hover{background:#2c3048}
+.btn-sm{padding:7px 12px;font-size:12px}
+.btn-block{width:100%}
+
+/* Layout */
+.wrap{max-width:520px;margin:0 auto;padding:40px 16px}
+.wide{max-width:860px}
+.center{text-align:center}
+
+/* Hero */
+.hero h1{font-size:38px;font-weight:800;letter-spacing:1px}
+.hero h1 b{color:#ff2e45}
+.hero p{color:#8288a5;margin:10px 0 28px;line-height:1.6}
+
+/* Card */
+.card{background:#1a1d2b;border:1px solid #262a3e;border-radius:14px;padding:26px;margin-bottom:16px}
+.card h2{font-size:16px;margin-bottom:16px;color:#e9ebf5}
+
+/* Inputs */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:#8288a5;margin-bottom:5px;font-weight:600}
+.field input,.field select{width:100%;padding:11px 12px;background:#0d0e13;border:1px solid #2c3048;border-radius:8px;color:#e9ebf5;font-size:14px;outline:none}
+.field input:focus,.field select:focus{border-color:#ff2e45}
+.field select option{background:#1a1d2b}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:18px}
+.tab{flex:1;padding:9px;text-align:center;border:1px solid #2c3048;border-radius:8px;font-size:13px;font-weight:600;color:#8288a5;background:transparent;cursor:pointer}
+.tab.on{background:#ff2e45;border-color:#ff2e45;color:#fff}
+
+/* Messages */
+.msg{padding:9px 12px;border-radius:8px;font-size:12px;margin-bottom:12px;display:none}
+.msg.show{display:block}
+.msg.err{background:#2a1517;color:#f4a5a5;border:1px solid #5a2028}
+.msg.ok{background:#132a1c;color:#6fec8f;border:1px solid #1c5a30}
+
+/* Hide/show */
+.hide{display:none!important}
+
+/* Key list */
+.klist{list-style:none}
+.kitem{display:flex;justify-content:space-between;align-items:center;background:#0d0e13;border:1px solid #2c3048;border-radius:8px;padding:12px 14px;margin-bottom:8px;gap:8px}
+.kitem .k{font-family:monospace;font-size:13px;letter-spacing:.5px;word-break:break-all}
+.kitem .m{font-size:10px;color:#8288a5;margin-top:3px}
+.badge{padding:2px 8px;border-radius:8px;font-size:9px;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.b-a{background:#1c3a1e;color:#6fec8f}.b-x{background:#3a1c1c;color:#f4a5a5}.b-u{background:#1c2c3a;color:#8ab4f8}.b-w{background:#262a3e;color:#aaa}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat{background:#1a1d2b;border:1px solid #262a3e;border-radius:12px;padding:14px;text-align:center}
+.stat .n{font-size:26px;font-weight:800;color:#ff2e45}
+.stat .t{font-size:9px;color:#8288a5;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 10px;color:#6b7090;font-size:10px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #2c3048}
+td{padding:8px 10px;border-bottom:1px solid #20233a}
+.mono{font-family:monospace;font-size:11px;word-break:break-all}
+
+.userrow{display:flex;justify-content:space-between;align-items:center;background:#0d0e13;border:1px solid #2c3048;border-radius:8px;padding:10px 14px;margin-bottom:8px}
+.userrow .u{font-weight:600}
+.userrow .s{font-size:11px;color:#8288a5}
+.mt{margin-top:14px}
+.p2{font-family:monospace;font-size:11px;background:#0d0e13;border:1px solid #2c3048;border-radius:8px;padding:10px;word-break:break-all;color:#6fec8f;display:none;margin-top:10px}
+.p2.show{display:block;max-height:140px;overflow-y:auto}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">CAL<b>AMITY</b></div>
+  <div class="nav-actions" id="navActions">
+    <button class="btn btn-gray btn-sm" onclick="go('dash')">Panel</button>
+    <button class="btn btn-green btn-sm hide" id="navAdmin" onclick="go('admin')">Admin</button>
+    <button class="btn btn-red btn-sm hide" id="navLogout" onclick="logout()">Çıkış</button>
+  </div>
+</nav>
+
+<div class="wrap" id="view-home">
+  <div class="hero center">
+    <h1>CAL<b>AMITY</b></h1>
+    <p>Giriş yap, key'ini aktifleştir, oyuna başla.</p>
+
+    <div class="card" style="text-align:left">
+      <div class="tabs">
+        <button class="tab on" id="tabL" onclick="tab('login')">Giriş</button>
+        <button class="tab" id="tabR" onclick="tab('register')">Kayıt</button>
+      </div>
+      <div class="msg err" id="authErr"></div>
+      <div class="msg ok" id="authOk"></div>
+
+      <div id="formLogin">
+        <div class="field"><label>Kullanıcı Adı</label><input id="inUser" autocomplete="username"></div>
+        <div class="field"><label>Şifre</label><input id="inPass" type="password" autocomplete="current-password"></div>
+        <button class="btn btn-red btn-block" onclick="login()">Giriş Yap</button>
+      </div>
+
+      <div id="formRegister" class="hide">
+        <div class="field"><label>Kullanıcı Adı</label><input id="rUser"></div>
+        <div class="field"><label>Şifre</label><input id="rPass" type="password"></div>
+        <div class="field"><label>Şifre Tekrar</label><input id="rPass2" type="password"></div>
+        <button class="btn btn-red btn-block" onclick="register()">Kayıt Ol</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap wide hide" id="view-dash">
+  <div class="card">
+    <h2>Hoş geldin, <span id="dUser">—</span></h2>
+    <div class="mt"></div>
+    <button class="btn btn-green" onclick="activateKey()">Key Aktifleştir</button>
+    <div class="msg err" id="kErr"></div>
+    <div class="msg ok" id="kOk"></div>
+    <div class="field"><input id="inKey" placeholder="CALAMITY-XXXX-XXXX-XXXX-XXXX"></div>
+  </div>
+
+  <div class="card">
+    <h2>Key'lerim</h2>
+    <ul class="klist" id="dKeys"></ul>
+  </div>
+</div>
+
+<div class="wrap wide hide" id="view-admin">
+  <div class="stats">
+    <div class="stat"><div class="n" id="stTotal">-</div><div class="t">Key</div></div>
+    <div class="stat"><div class="n" id="stUsed">-</div><div class="t">Aktif</div></div>
+    <div class="stat"><div class="n" id="stRevoked">-</div><div class="t">İptal</div></div>
+    <div class="stat"><div class="n" id="stUsers">-</div><div class="t">Kullanıcı</div></div>
+  </div>
+
+  <div class="card" style="text-align:left">
+    <h2>Key Üret</h2>
+    <div class="grid2">
+      <div class="field">
+        <label>Süre</label>
+        <select id="inType">
+          <option value="day">Gün</option>
+          <option value="week">Hafta</option>
+          <option value="month" selected>Ay</option>
+          <option value="year">Yıl</option>
+          <option value="unlimited">Sınırsız</option>
+        </select>
+      </div>
+      <div class="field"><label>Adet</label><input id="inCount" type="number" value="1" min="1" max="100"></div>
+    </div>
+    <label class="field" style="display:block;font-size:11px;color:#8288a5;margin:4px 0 10px;font-weight:600">
+      Kullanıcıya ata (opsiyonel)
+      <div style="margin-top:5px">
+        <select id="inNewUser" style="width:100%;padding:11px 12px;background:#0d0e13;border:1px solid #2c3048;border-radius:8px;color:#e9ebf5;font-size:13px;outline:none">
+          <option value="">— Yeni kullanıcı oluştur veya boş bırak —</option>
+        </select>
+      </div>
+    </label>
+    <div class="grid2">
+      <div class="field"><label>Yeni kullanıcı adı</label><input id="nuUser" placeholder="(opsiyonel)"></div>
+      <div class="field"><label>Yeni kullanıcı şifre</label><input id="nuPass" type="password" placeholder="(opsiyonel)"></div>
+    </div>
+    <div class="msg err" id="adErr"></div>
+    <div class="msg ok" id="adOk"></div>
+    <button class="btn btn-green btn-block" onclick="genKey()">Key Üret</button>
+    <div class="p2" id="p2"></div>
+  </div>
+
+  <div class="card" style="text-align:left">
+    <h2>Key'ler</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Key</th><th>Süre</th><th>Sahip</th><th>Durum</th><th></th></tr></thead>
+        <tbody id="tKeys"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="text-align:left">
+    <h2>Kullanıcılar</h2>
+    <div id="uList"></div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+let token = localStorage.getItem('cf_token') || '';
+let role  = localStorage.getItem('cf_role') || '';
+
+const $ = s => document.querySelector(s);
+
+function go(view) {
+  ['home','dash','admin'].forEach(v =>
+    $('#view-' + v).classList.toggle('hide', v !== view));
+}
+function msg(el, text, ok) {
+  el.textContent = text;
+  el.className = 'msg show ' + (ok ? 'ok' : 'err');
+}
+async function api(path, opts={}) {
+  const h = { 'Content-Type': 'application/json' };
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  const r = await fetch(API + path, { ...opts, headers: h, body: opts.body && JSON.stringify(opts.body) });
+  return r.json().catch(() => ({ ok:false, error:'Yanıt alınamadı' }));
+}
+
+function tab(name) {
+  $('#formLogin').classList.toggle('hide', name !== 'login');
+  $('#formRegister').classList.toggle('hide', name !== 'register');
+  $('#tabL').classList.toggle('on', name === 'login');
+  $('#tabR').classList.toggle('on', name === 'register');
+}
+
+async function login() {
+  const d = await api('/api/auth/login', { method:'POST', body:{ username: $('#inUser').value.trim(), password: $('#inPass').value }});
+  if (!d.ok) return msg($('#authErr'), d.error);
+  token = d.token; role = d.user.role;
+  localStorage.setItem('cf_token', token);
+  localStorage.setItem('cf_role', role);
+  afterAuth();
+}
+async function register() {
+  const p = $('#rPass').value, p2 = $('#rPass2').value;
+  if (p !== p2) return msg($('#authErr'), 'Şifreler eşleşmiyor');
+  const d = await api('/api/auth/register', { method:'POST', body:{ username: $('#rUser').value.trim(), password: p }});
+  if (!d.ok) return msg($('#authErr'), d.error);
+  msg($('#authOk'), 'Kayıt başarılı!', true);
+  token = d.token; role = d.user.role;
+  localStorage.setItem('cf_token', token);
+  localStorage.setItem('cf_role', role);
+  setTimeout(afterAuth, 500);
+}
+
+function afterAuth() {
+  $('#navAdmin').classList.toggle('hide', role !== 'admin');
+  $('#navLogout').classList.remove('hide');
+  $('#dUser').textContent = localStorage.getItem('cf_user') || '';
+  loadDashboard();
+  if (role === 'admin') loadAdmin();
+  go('dash');
+}
+
+async function loadDashboard() {
+  const d = await api('/api/auth/me');
+  if (!d.ok) return logout();
+  $('#dUser').textContent = d.user.username;
+  localStorage.setItem('cf_user', d.user.username);
+  const keys = d.keys || [];
+  $('#dKeys').innerHTML = keys.length
+    ? keys.map(k => {
+        const now = Math.floor(Date.now()/1000);
+        const b = k.duration_type === 'unlimited' ? '<span class="badge b-u">Sınırsız</span>'
+                : (k.expires_at && now > k.expires_at) ? '<span class="badge b-x">Bitti</span>'
+                : k.activated_at ? '<span class="badge b-a">Aktif</span>' : '<span class="badge b-w">Bekliyor</span>';
+        return `<li class="kitem"><div><div class="k">${k.key}</div>
+          <div class="m">${k.duration_label} · Bitiş: ${k.expires_at ? new Date(k.expires_at*1000).toLocaleDateString('tr-TR') : 'Sınırsız'} · ${k.activated_at ? 'Aktifleştirildi' : 'Henüz kullanılmadı'}</div></div>${b}</li>`;
+      }).join('')
+    : '<li class="center" style="color:#6b7090;padding:16px">Henüz key yok</li>';
+}
+
+async function activateKey() {
+  hideMsg($('#kErr'), $('#kOk'));
+  const key = $('#inKey').value.trim();
+  if (!key) return msg($('#kErr'), 'Key gir');
+  const hwid = 'browser-' + (navigator.userAgent||'x').slice(0,24);
+  const d = await api('/api/license/activate', { method:'POST', body:{ key, hwid }});
+  if (!d.ok) return msg($('#kErr'), d.error);
+  msg($('#kOk'), 'Key aktifleştirildi!', true);
+  $('#inKey').value = '';
+  loadDashboard();
+}
+function hideMsg(a,b){ a.classList.remove('show'); b.classList.remove('show'); }
+
+/* ── Admin ─────────────────────────────────────────── */
+async function loadAdmin() {
+  const s = await api('/api/admin/stats');
+  if (s.ok) {
+    $('#stTotal').textContent = s.stats.total;
+    $('#stUsed').textContent  = s.stats.used;
+    $('#stRevoked').textContent = s.stats.revoked;
+    $('#stUsers').textContent = s.stats.users;
+  }
+  await Promise.all([loadKeys(), loadUsers()]);
+}
+
+async function loadKeys() {
+  const d = await api('/api/admin/keys');
+  if (!d.ok) return;
+  $('#tKeys').innerHTML = d.keys.map(k => {
+    const now = Math.floor(Date.now()/1000);
+    const b = k.revoked ? '<span class="badge b-x">İptal</span>'
+            : k.duration_type === 'unlimited' ? '<span class="badge b-u">Sınırsız</span>'
+            : (k.expires_at && now > k.expires_at) ? '<span class="badge b-x">Bitti</span>'
+            : k.activated_at ? '<span class="badge b-a">Aktif</span>' : '<span class="badge b-w">Bekliyor</span>';
+    return `<tr><td class="mono">${k.key}</td><td>${k.duration_label}</td><td>${k.owner || '—'}</td>
+      <td>${b}</td><td><button class="btn btn-gray btn-sm" onclick="revoke(${k.id},${k.revoked})">${k.revoked ? 'Geri Al' : 'İptal'}</button></td></tr>`;
+  }).join('');
+}
+async function revoke(id, was) {
+  await api('/api/admin/keys/' + id + '/revoke', { method:'PATCH', body:{ revoke:!was }});
+  loadAdmin();
+}
+
+async function loadUsers() {
+  const d = await api('/api/admin/users');
+  if (!d.ok) return;
+  const me = localStorage.getItem('cf_user');
+  $('#uList').innerHTML = d.users.map(u =>
+    `<div class="userrow"><div><div class="u">${u.username}</div>
+      <div class="s">#${u.id} · ${u.role} · ${u.key_count} key</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-gray btn-sm" onclick="setRole(${u.id},'${u.role}')">${u.role === 'admin' ? 'Kullanıcı Yap' : u.role === 'banned' ? 'Aç' : 'Admin Yap'}</button>
+        ${u.username !== me ? `<button class="btn btn-red btn-sm" onclick="delUser(${u.id})">Sil</button>` : ''}
+      </div></div>`
+  ).join('');
+  loadKeyUserSelect(d.users);
+}
+async function setRole(id, cur) {
+  const next = cur === 'admin' ? 'user' : cur === 'banned' ? 'user' : 'admin';
+  const d = await api('/api/admin/users/' + id, { method:'PATCH', body:{ role: next }});
+  loadAdmin();
+}
+async function delUser(id) {
+  if (!confirm('Kullanıcı silinsin mi?')) return;
+  await api('/api/admin/users/' + id, { method:'DELETE' });
+  loadAdmin();
+}
+function loadKeyUserSelect(users) {
+  const sel = $('#inNewUser');
+  sel.innerHTML = '<option value="">— Ücretsiz key —</option>' +
+    users.filter(u => u.role !== 'admin' && u.role !== 'banned').map(u =>
+      '<option value="' + u.id + '">' + u.username + '</option>').join('');
+}
+
+async function genKey() {
+  hideAd();
+  const nu = $('#nuUser').value.trim(), np = $('#nuPass').value;
+  let userId = $('#inNewUser').value || null;
+  if (nu) {
+    const c = await api('/api/admin/users', { method:'POST', body:{ username:nu, password:np || 'sifre123' }});
+    if (!c.ok) return msg($('#adErr'), c.error);
+    userId = c.user.id;
+    $('#nuUser').value = ''; $('#nuPass').value = '';
+    msg($('#adOk'), 'Kullanıcı oluşturuldu, key atanıyor...', true);
+  }
+  const d = await api('/api/admin/keys', { method:'POST', body:{
+    duration_type: $('#inType').value,
+    value: 1,
+    count: +$('#inCount').value || 1,
+    userId,
+  }});
+  if (!d.ok) return msg($('#adErr'), d.error);
+  const box = $('#p2');
+  box.classList.add('show');
+  box.textContent = d.keys.join('\n');
+  msg($('#adOk'), d.count + ' key üretildi!', true);
+  loadAdmin();
+}
+function hideAd() { $('#adErr').classList.remove('show'); $('#adOk').classList.remove('show'); }
+
+function logout() {
+  token = ''; role = '';
+  localStorage.clear();
+  $('#navAdmin').classList.add('hide');
+  $('#navLogout').classList.add('hide');
+  go('home');
+}
+
+if (token) {
+  afterAuth();
+} else {
+  go('home');
+}
+</script>
+</body>
+</html>
