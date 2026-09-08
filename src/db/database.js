@@ -4,14 +4,19 @@ const crypto = require('crypto');
 const { neon } = require('@neondatabase/serverless');
 
 const DATABASE_URL = process.env.DATABASE_URL;
+let dbError = null;
 if (!DATABASE_URL) {
-  throw new Error('DATABASE_URL çevre değişkeni eksik — Neon connection string gir (.env veya Vercel env)');
+  dbError = new Error('DATABASE_URL çevre değişkeni eksik — Vercel ayarlarından Neon connection string gir');
 }
-const sql = neon(DATABASE_URL);
+const sql = DATABASE_URL ? neon(DATABASE_URL) : null;
 
 // ── Şema (Postgres / Neon) ─────────────────────────────────────────
 // Ne sorulursa sorulsun: tablolar yoksa otomatik oluşturulur.
 async function initSchema() {
+  if (!sql) {
+    if (dbError) throw dbError;
+    throw new Error('Veritabanı bağlantısı kurulamadı (DATABASE_URL yok)');
+  }
   await sql`
     CREATE TABLE IF NOT EXISTS users (
       id          SERIAL PRIMARY KEY,
